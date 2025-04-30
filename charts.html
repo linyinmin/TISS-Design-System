@@ -27,6 +27,7 @@
             margin: 0;
             padding: 0;
             background-color: #f8f9fa;
+            overflow-x: hidden;
         }
         
         .sidebar {
@@ -41,12 +42,11 @@
             border-right: 1px solid #e0e0e0;
             box-shadow: 2px 0 5px rgba(0,0,0,0.05);
             transition: all 0.3s ease;
+            z-index: 100;
         }
         
         .sidebar.collapsed {
-            width: 0;
-            padding: 0;
-            overflow: hidden;
+            transform: translateX(-100%);
         }
         
         .sidebar-toggle {
@@ -72,15 +72,17 @@
         }
         
         .main-content {
-            margin-left: 250px;
+            position: relative;
+            margin-left: 320px;
             padding: 2rem;
-            transition: margin-left 0.3s ease;
-            width: calc(100% - 250px);
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            width: auto;
+            overflow-x: hidden;
         }
         
         .main-content.expanded {
             margin-left: 0;
-            width: 100%;
         }
         
         .chart-section {
@@ -89,6 +91,8 @@
             padding: 2rem;
             margin-bottom: 2rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            width: 100%;
+            box-sizing: border-box;
         }
         
         .chart-container {
@@ -96,6 +100,7 @@
             margin-bottom: 2rem;
             position: relative;
             width: 100%;
+            box-sizing: border-box;
         }
         
         .chart-title {
@@ -103,6 +108,9 @@
             margin-bottom: 1rem;
             padding-bottom: 0.5rem;
             border-bottom: 2px solid var(--tiss-blue);
+            width: 100%;
+            box-sizing: border-box;
+            word-wrap: break-word;
         }
         
         .nav-link {
@@ -152,12 +160,11 @@
             .main-content {
                 margin-left: 0;
                 padding: 1rem;
+                width: 100%;
             }
             
             .sidebar {
-                width: 0;
-                padding: 0;
-                overflow: hidden;
+                transform: translateX(-100%);
             }
             
             .sidebar-toggle {
@@ -323,10 +330,27 @@
                     window.dispatchEvent(new Event('resize'));
                 }, 300);
             });
-            
+
+            // 確保在視窗大小改變時重新渲染圖表
+            window.addEventListener('resize', function() {
+                const charts = document.querySelectorAll('canvas');
+                charts.forEach(canvas => {
+                    if (canvas.chart) {
+                        canvas.chart.resize();
+                    }
+                });
+            });
+
+            // 初始化所有圖表時，將 chart 實例保存到 canvas 元素上
+            function initChart(canvas, config) {
+                const chart = new Chart(canvas, config);
+                canvas.chart = chart;
+                return chart;
+            }
+
             // 折線圖 - 心率變化
             const lineCtx = document.getElementById('lineChart').getContext('2d');
-            new Chart(lineCtx, {
+            initChart(lineCtx, {
                 type: 'line',
                 data: {
                     labels: ['熱身', '5分鐘', '10分鐘', '15分鐘', '20分鐘', '25分鐘', '30分鐘', '緩和'],
@@ -363,7 +387,7 @@
 
             // 長條圖 - 每週運動時間分配
             const barCtx = document.getElementById('barChart').getContext('2d');
-            new Chart(barCtx, {
+            initChart(barCtx, {
                 type: 'bar',
                 data: {
                     labels: ['有氧運動', '肌力訓練', '伸展運動', '核心訓練', '平衡訓練', '恢復日'],
@@ -403,7 +427,7 @@
 
             // 水平長條圖 - 運動項目喜好度
             const horizontalBarCtx = document.getElementById('horizontalBarChart').getContext('2d');
-            new Chart(horizontalBarCtx, {
+            initChart(horizontalBarCtx, {
                 type: 'bar',
                 data: {
                     labels: ['跑步', '游泳', '騎自行車', '瑜伽', '重量訓練', '球類運動'],
@@ -438,7 +462,7 @@
 
             // 堆疊長條圖 - 每日運動時間分配
             const stackedBarCtx = document.getElementById('stackedBarChart').getContext('2d');
-            new Chart(stackedBarCtx, {
+            initChart(stackedBarCtx, {
                 type: 'bar',
                 data: {
                     labels: ['週一', '週二', '週三', '週四', '週五', '週六', '週日'],
@@ -482,7 +506,7 @@
 
             // 浮動長條圖 - 體重變化範圍
             const floatingBarCtx = document.getElementById('floatingBarChart').getContext('2d');
-            new Chart(floatingBarCtx, {
+            initChart(floatingBarCtx, {
                 type: 'bar',
                 data: {
                     labels: ['一月', '二月', '三月', '四月', '五月', '六月'],
@@ -522,7 +546,7 @@
 
             // 圓餅圖 - 運動強度分布
             const pieCtx = document.getElementById('pieChart').getContext('2d');
-            new Chart(pieCtx, {
+            initChart(pieCtx, {
                 type: 'pie',
                 data: {
                     labels: ['低強度', '中強度', '高強度', '恢復'],
@@ -553,7 +577,7 @@
 
             // 環圈圖 - 營養攝入比例
             const doughnutCtx = document.getElementById('doughnutChart').getContext('2d');
-            new Chart(doughnutCtx, {
+            initChart(doughnutCtx, {
                 type: 'doughnut',
                 data: {
                     labels: ['蛋白質', '碳水化合物', '脂肪', '維生素', '礦物質'],
@@ -585,7 +609,7 @@
 
             // 雷達圖 - 運動能力評估
             const radarCtx = document.getElementById('radarChart').getContext('2d');
-            new Chart(radarCtx, {
+            initChart(radarCtx, {
                 type: 'radar',
                 data: {
                     labels: ['心肺耐力', '肌力', '柔軟度', '平衡感', '協調性', '爆發力'],
