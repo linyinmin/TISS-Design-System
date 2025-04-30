@@ -909,6 +909,44 @@
             height: auto;
             display: block;
         }
+
+        /* 在 style 標籤內添加以下樣式 */
+        .font-demo {
+            background: var(--tiss-gray-100);
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .font-item {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .font-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .font-regular {
+            font-weight: 400;
+            line-height: 1.8;
+            margin: 1rem 0;
+        }
+
+        .font-medium {
+            font-weight: 500;
+            line-height: 1.8;
+            margin: 1rem 0;
+        }
+
+        .font-bold {
+            font-weight: 700;
+            line-height: 1.8;
+            margin: 1rem 0;
+        }
     </style>
 </head>
 <body>
@@ -992,7 +1030,38 @@
 
         <!-- 排版 -->
         <section id="typography" class="section component-section">
-            <h2 class="component-title">排版</h2>
+            <h2 class="component-title">字體</h2>
+            
+            <!-- 字體展示 -->
+            <div class="font-demo tiss-mb-4">
+                <h3 class="tiss-h4 tiss-mb-3">字體展示</h3>
+                <div class="font-item">
+                    <h4 class="tiss-h5">標準文字 Regular Text</h4>
+                    <p class="font-regular">
+                        運動科學數據分析 Sports Science Data Analysis<br>
+                        字重 400：國家運動科學中心致力於運動員的科學化訓練。<br>
+                        Weight 400: The National Sports Science Center is dedicated to scientific training for athletes.
+                    </p>
+                </div>
+                <div class="font-item">
+                    <h4 class="tiss-h5">中等文字 Medium Text</h4>
+                    <p class="font-medium">
+                        運動科學數據分析 Sports Science Data Analysis<br>
+                        字重 500：專業的運動數據收集與分析系統。<br>
+                        Weight 500: Professional sports data collection and analysis system.
+                    </p>
+                </div>
+                <div class="font-item">
+                    <h4 class="tiss-h5">粗體文字 Bold Text</h4>
+                    <p class="font-bold">
+                        運動科學數據分析 Sports Science Data Analysis<br>
+                        字重 700：提升運動表現的科學方法。<br>
+                        Weight 700: Scientific methods for enhancing athletic performance.
+                    </p>
+                </div>
+            </div>
+
+            <h3 class="tiss-h4 tiss-mb-3">標題樣式</h3>
             <div class="component-grid">
                 <div class="component-item">
                     <h1 class="tiss-h1">標題 1</h1>
