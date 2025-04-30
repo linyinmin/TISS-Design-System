@@ -1,0 +1,2068 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TISS Design System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="scss/tiss.scss">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --tiss-blue: #004D9F;
+            --tiss-dark-blue: #003366;
+            --tiss-green: #00A886;
+            --tiss-yellow: #FACB00;
+            --tiss-orange: #F29027;
+            --tiss-cyan: #00B1AD;
+            --tiss-error: #DC3545;
+            --tiss-warning: #FFA500;
+            --tiss-success: #28A745;
+            --tiss-info: #17A2B8;
+            --tiss-gray-100: #f8f9fa;
+            --tiss-gray-200: #e9ecef;
+            --tiss-gray-300: #dee2e6;
+            --tiss-gray-400: #ced4da;
+            --tiss-gray-500: #adb5bd;
+            --tiss-gray-600: #6c757d;
+            --tiss-gray-700: #495057;
+            --tiss-gray-800: #343a40;
+            --tiss-gray-900: #212529;
+        }
+        
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--tiss-gray-100);
+            color: var(--tiss-gray-900);
+        }
+        
+        .component-section {
+            margin-bottom: 3rem;
+            padding: 2rem;
+            border: 1px solid var(--tiss-gray-300);
+            border-radius: 8px;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .component-title {
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--tiss-blue);
+            color: var(--tiss-dark-blue);
+            font-weight: 700;
+        }
+        
+        .component-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .component-item {
+            padding: 1.5rem;
+            border: 1px solid var(--tiss-gray-300);
+            border-radius: 8px;
+            background-color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .component-item:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .code-block {
+            background: var(--tiss-gray-100);
+            padding: 1rem;
+            border-radius: 4px;
+            margin-top: 1rem;
+            font-family: monospace;
+            position: relative;
+            padding-right: 80px; /* 為複製按鈕留出空間 */
+        }
+        
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+            color: var(--tiss-gray-600);
+            padding: 0.25rem;
+        }
+        
+        .copy-btn:hover {
+            opacity: 1;
+            color: var(--tiss-blue);
+        }
+        
+        .copy-btn i {
+            font-size: 1rem;
+        }
+        
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+        
+        .color-item {
+            padding: 1.5rem;
+            border-radius: 8px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .color-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .color-item.light {
+            color: #333;
+        }
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            height: 100vh;
+            background: var(--tiss-gray-100);
+            padding: 2rem;
+            overflow-y: auto;
+            border-right: 1px solid var(--tiss-gray-300);
+            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar.collapsed {
+            width: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .sidebar-toggle {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1000;
+            background: var(--tiss-blue);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-toggle:hover {
+            background: var(--tiss-dark-blue);
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+            transition: margin-left 0.3s ease;
+        }
+        
+        .main-content.expanded {
+            margin-left: 0;
+        }
+        
+        .nav-link {
+            display: block;
+            padding: 0.75rem 0;
+            color: var(--tiss-gray-700);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            padding-left: 1rem;
+        }
+        
+        .nav-link:hover {
+            color: var(--tiss-blue);
+            border-left: 3px solid var(--tiss-blue);
+            background-color: rgba(119, 203, 242, 0.1);
+        }
+        
+        .section {
+            scroll-margin-top: 2rem;
+        }
+        
+        .tiss-modal-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        
+        .tiss-modal-backdrop.tiss-modal-show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .tiss-modal {
+            background-color: white;
+            border-radius: 8px;
+            width: 500px;
+            max-width: 90%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .tiss-modal-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--tiss-gray-300);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .tiss-modal-title {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .tiss-modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--tiss-gray-600);
+        }
+        
+        .tiss-modal-body {
+            padding: 1.5rem;
+        }
+        
+        .tiss-modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--tiss-gray-300);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+        
+        /* 複製成功提示 */
+        .copy-toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--tiss-green);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 1000;
+            animation: fadeInOut 2.5s ease;
+        }
+        
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(20px); }
+            10% { opacity: 1; transform: translateY(0); }
+            90% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
+        
+        /* 確保元件樣式正確套用 */
+        .tiss-btn {
+            display: inline-block;
+            font-weight: 500;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            user-select: none;
+            border: 1px solid transparent;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .tiss-btn-primary {
+            color: white;
+            background-color: var(--tiss-blue);
+            border-color: var(--tiss-blue);
+        }
+        
+        .tiss-btn-primary:hover {
+            background-color: #003d7c;
+            border-color: #003d7c;
+        }
+        
+        .tiss-btn-secondary {
+            color: white;
+            background-color: var(--tiss-green);
+            border-color: var(--tiss-green);
+        }
+        
+        .tiss-btn-secondary:hover {
+            background-color: #008f6f;
+            border-color: #008f6f;
+        }
+        
+        .tiss-btn-accent {
+            color: white;
+            background-color: var(--tiss-dark-blue);
+            border-color: var(--tiss-dark-blue);
+        }
+        
+        .tiss-btn-accent:hover {
+            background-color: #003d7c;
+            border-color: #003d7c;
+        }
+        
+        .tiss-btn-outline {
+            background-color: transparent;
+        }
+        
+        .tiss-btn-outline.tiss-btn-primary {
+            color: var(--tiss-blue);
+            border-color: var(--tiss-blue);
+        }
+        
+        .tiss-btn-outline.tiss-btn-primary:hover {
+            color: white;
+            background-color: var(--tiss-blue);
+        }
+        
+        .tiss-btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .tiss-btn-lg {
+            padding: 0.75rem 1.5rem;
+            font-size: 1.25rem;
+        }
+        
+        .tiss-form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .tiss-label {
+            display: inline-block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .tiss-input, .tiss-select, .tiss-textarea {
+            display: block;
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: var(--tiss-gray-900);
+            background-color: white;
+            background-clip: padding-box;
+            border: 1px solid var(--tiss-gray-400);
+            border-radius: 4px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .tiss-input:focus, .tiss-select:focus, .tiss-textarea:focus {
+            border-color: var(--tiss-blue);
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(119, 203, 242, 0.25);
+        }
+        
+        .tiss-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .tiss-checkbox, .tiss-radio {
+            margin-right: 0.5rem;
+        }
+        
+        .tiss-alert {
+            position: relative;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid transparent;
+            border-radius: 4px;
+        }
+        
+        .tiss-alert-primary {
+            color: white;
+            background-color: var(--tiss-blue);
+            border-color: var(--tiss-blue);
+        }
+        
+        .tiss-alert-secondary {
+            color: white;
+            background-color: var(--tiss-green);
+            border-color: var(--tiss-green);
+        }
+        
+        .tiss-alert-accent {
+            color: white;
+            background-color: var(--tiss-dark-blue);
+            border-color: var(--tiss-dark-blue);
+        }
+        
+        .tiss-alert-success {
+            color: white;
+            background-color: var(--tiss-success);
+            border-color: var(--tiss-success);
+        }
+        
+        .tiss-alert-danger {
+            color: white;
+            background-color: var(--tiss-error);
+            border-color: var(--tiss-error);
+        }
+        
+        .tiss-alert-warning {
+            color: var(--tiss-gray-900);
+            background-color: var(--tiss-warning);
+            border-color: var(--tiss-warning);
+        }
+        
+        .tiss-alert-info {
+            color: white;
+            background-color: var(--tiss-info);
+            border-color: var(--tiss-info);
+        }
+        
+        .tiss-badge {
+            display: inline-block;
+            padding: 0.25em 0.4em;
+            font-size: 75%;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 4px;
+            color: white;
+        }
+        
+        .tiss-badge-primary {
+            background-color: var(--tiss-blue);
+        }
+        
+        .tiss-badge-secondary {
+            background-color: var(--tiss-green);
+        }
+        
+        .tiss-badge-accent {
+            background-color: var(--tiss-dark-blue);
+        }
+        
+        .tiss-badge-success {
+            background-color: var(--tiss-success);
+        }
+        
+        .tiss-badge-danger {
+            background-color: var(--tiss-error);
+        }
+        
+        .tiss-badge-warning {
+            background-color: var(--tiss-warning);
+            color: var(--tiss-gray-900);
+        }
+        
+        .tiss-badge-info {
+            background-color: var(--tiss-info);
+        }
+        
+        .tiss-table {
+            width: 100%;
+            margin-bottom: 1rem;
+            color: var(--tiss-gray-900);
+            border-collapse: collapse;
+        }
+        
+        .tiss-table th,
+        .tiss-table td {
+            padding: 0.75rem;
+            vertical-align: top;
+            border-top: 1px solid var(--tiss-gray-300);
+        }
+        
+        .tiss-table thead th {
+            vertical-align: bottom;
+            border-bottom: 2px solid var(--tiss-blue);
+            background-color: var(--tiss-blue);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .tiss-table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(0, 77, 159, 0.1);
+        }
+        
+        .tiss-table tbody tr:hover {
+            background-color: rgba(0, 77, 159, 0.2);
+        }
+        
+        .tiss-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            word-wrap: break-word;
+            background-color: white;
+            background-clip: border-box;
+            border: 1px solid var(--tiss-gray-300);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .tiss-card-header {
+            padding: 1rem;
+            margin-bottom: 0;
+            background-color: var(--tiss-gray-100);
+            border-bottom: 1px solid var(--tiss-gray-300);
+            border-top-left-radius: 7px;
+            border-top-right-radius: 7px;
+        }
+        
+        .tiss-card-body {
+            flex: 1 1 auto;
+            padding: 1rem;
+        }
+        
+        .tiss-card-footer {
+            padding: 1rem;
+            background-color: var(--tiss-gray-100);
+            border-top: 1px solid var(--tiss-gray-300);
+            border-bottom-left-radius: 7px;
+            border-bottom-right-radius: 7px;
+        }
+
+        /* 工具類別樣式 */
+        .tiss-text-primary {
+            color: var(--tiss-blue);
+        }
+        
+        .tiss-text-secondary {
+            color: var(--tiss-green);
+        }
+        
+        .tiss-text-accent {
+            color: var(--tiss-dark-blue);
+        }
+        
+        .tiss-bg-primary {
+            background-color: var(--tiss-blue);
+            color: white;
+        }
+        
+        .tiss-bg-secondary {
+            background-color: var(--tiss-green);
+            color: white;
+        }
+        
+        .tiss-bg-accent {
+            background-color: var(--tiss-dark-blue);
+            color: white;
+        }
+        
+        .tiss-rounded-sm {
+            border-radius: 4px;
+        }
+        
+        .tiss-rounded-md {
+            border-radius: 8px;
+        }
+        
+        .tiss-rounded-lg {
+            border-radius: 12px;
+        }
+        
+        .tiss-shadow-sm {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .tiss-shadow-md {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .tiss-shadow-lg {
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+        
+        .tiss-p-1 { padding: 0.25rem; }
+        .tiss-p-2 { padding: 0.5rem; }
+        .tiss-p-3 { padding: 1rem; }
+        .tiss-p-4 { padding: 1.5rem; }
+        .tiss-p-5 { padding: 2rem; }
+        
+        .tiss-mt-1 { margin-top: 0.25rem; }
+        .tiss-mt-2 { margin-top: 0.5rem; }
+        .tiss-mt-3 { margin-top: 1rem; }
+        .tiss-mt-4 { margin-top: 1.5rem; }
+        .tiss-mt-5 { margin-top: 2rem; }
+        
+        .tiss-mb-1 { margin-bottom: 0.25rem; }
+        .tiss-mb-2 { margin-bottom: 0.5rem; }
+        .tiss-mb-3 { margin-bottom: 1rem; }
+        .tiss-mb-4 { margin-bottom: 1.5rem; }
+        .tiss-mb-5 { margin-bottom: 2rem; }
+
+        /* 卡片樣式 */
+        .tiss-card-hover {
+            transition: all 0.3s ease;
+        }
+
+        .tiss-card-hover:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .tiss-card-bordered {
+            border: 2px solid var(--tiss-gray-300);
+        }
+
+        /* 圖表容器樣式 */
+        .tiss-chart-container {
+            width: 100%;
+            height: 300px;
+            margin-bottom: 1rem;
+        }
+
+        /* 核取方塊樣式 */
+        .tiss-checkbox-group {
+            margin-bottom: 1rem;
+        }
+
+        .tiss-checkbox-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .tiss-checkbox {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        .tiss-checkbox-custom {
+            position: relative;
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            background-color: white;
+            border: 2px solid var(--tiss-gray-400);
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .tiss-checkbox:checked + .tiss-checkbox-custom {
+            background-color: var(--tiss-blue);
+            border-color: var(--tiss-blue);
+        }
+
+        .tiss-checkbox:checked + .tiss-checkbox-custom::after {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 2px;
+            width: 6px;
+            height: 12px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        /* 可折疊面板樣式 */
+        .tiss-collapsible {
+            border: 1px solid var(--tiss-gray-300);
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+
+        .tiss-collapsible-header {
+            width: 100%;
+            padding: 1rem;
+            background: none;
+            border: none;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+        }
+
+        .tiss-collapsible-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .tiss-collapsible.active .tiss-collapsible-icon {
+            transform: rotate(180deg);
+        }
+
+        .tiss-collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .tiss-collapsible.active .tiss-collapsible-content {
+            max-height: 500px;
+        }
+
+        .tiss-collapsible-body {
+            padding: 1rem;
+            border-top: 1px solid var(--tiss-gray-300);
+        }
+
+        /* 進度條樣式 */
+        .tiss-progress {
+            height: 20px;
+            background-color: var(--tiss-gray-200);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .tiss-progress-bar {
+            height: 100%;
+            background-color: var(--tiss-blue);
+            color: white;
+            text-align: center;
+            line-height: 20px;
+            transition: width 0.3s ease;
+        }
+
+        .tiss-progress-striped .tiss-progress-bar {
+            background-image: linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);
+            background-size: 1rem 1rem;
+            animation: progress-bar-stripes 1s linear infinite;
+        }
+
+        .tiss-progress-sm {
+            height: 10px;
+        }
+
+        .tiss-progress-sm .tiss-progress-bar {
+            line-height: 10px;
+            font-size: 0.75rem;
+        }
+
+        @keyframes progress-bar-stripes {
+            from { background-position: 1rem 0; }
+            to { background-position: 0 0; }
+        }
+
+        /* 分頁標籤樣式 */
+        .tiss-tabs {
+            margin-bottom: 1rem;
+        }
+
+        .tiss-tabs-nav {
+            display: flex;
+            border-bottom: 1px solid var(--tiss-gray-300);
+            margin-bottom: 1rem;
+        }
+
+        .tiss-tab-item {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--tiss-gray-600);
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tiss-tab-item:hover {
+            color: var(--tiss-blue);
+        }
+
+        .tiss-tab-active {
+            color: var(--tiss-blue);
+            border-bottom-color: var(--tiss-blue);
+        }
+
+        .tiss-tab-pane {
+            display: none;
+            padding: 1rem 0;
+        }
+
+        .tiss-tab-pane.tiss-tab-active {
+            display: block;
+        }
+
+        /* 開關樣式 */
+        .tiss-toggle {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .tiss-toggle-input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .tiss-toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--tiss-gray-300);
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .tiss-toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        .tiss-toggle-input:checked + .tiss-toggle-slider {
+            background-color: var(--tiss-blue);
+        }
+
+        .tiss-toggle-input:checked + .tiss-toggle-slider:before {
+            transform: translateX(26px);
+        }
+
+        /* 分頁導航樣式 */
+        .tiss-page-nav {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--tiss-gray-300);
+            padding-bottom: 1rem;
+        }
+
+        .tiss-page-nav-item {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: var(--tiss-gray-600);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tiss-page-nav-item:hover {
+            color: var(--tiss-blue);
+        }
+
+        .tiss-page-nav-item.active {
+            color: var(--tiss-blue);
+            border-bottom-color: var(--tiss-blue);
+        }
+
+        .tiss-page-content {
+            display: none;
+        }
+
+        .tiss-page-content.active {
+            display: block;
+        }
+
+        /* 在 style 標籤內添加以下樣式 */
+        .sidebar-logo {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            border-bottom: 1px solid var(--tiss-gray-300);
+        }
+        
+        .logo-img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- 側邊欄收合按鈕 -->
+    <button class="sidebar-toggle" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- 側邊導航 -->
+    <nav class="sidebar">
+        <div class="sidebar-logo">
+            <img src="Tiss Logo-h.png" alt="TISS Logo" class="logo-img">
+        </div>
+        <nav>
+            <a href="#colors" class="nav-link">顏色</a>
+            <a href="#typography" class="nav-link">字體</a>
+            <a href="#components" class="nav-link">元件</a>
+            <a href="#utilities" class="nav-link">工具類</a>
+            <a href="usage.html" class="nav-link">使用方法</a>
+        </nav>
+    </nav>
+
+    <!-- 主要內容 -->
+    <main class="main-content">
+        <!-- 顏色系統 -->
+        <section id="colors" class="section component-section">
+            <h2 class="component-title">顏色系統</h2>
+            <h3 class="tiss-h4 tiss-mb-3">主要顏色</h3>
+            <div class="color-grid">
+                <div class="color-item" style="background-color: #004D9F;">
+                    <div>躍動藍</div>
+                    <div>#004D9F</div>
+                </div>
+                <div class="color-item" style="background-color: #00A886;">
+                    <div>植蘊綠</div>
+                    <div>#00A886</div>
+                </div>
+                <div class="color-item" style="background-color: #003366;">
+                    <div>深藍</div>
+                    <div>#003366</div>
+                </div>
+            </div>
+
+            <h3 class="tiss-h4 tiss-mt-4 tiss-mb-3">輔助顏色</h3>
+            <div class="color-grid">
+                <div class="color-item light" style="background-color: #FACB00;">
+                    <div>星曜黃</div>
+                    <div>#FACB00</div>
+                </div>
+                <div class="color-item" style="background-color: #F29027;">
+                    <div>日橙橘</div>
+                    <div>#F29027</div>
+                </div>
+                <div class="color-item" style="background-color: #00B1AD;">
+                    <div>沁湖藍</div>
+                    <div>#00B1AD</div>
+                </div>
+            </div>
+
+            <h3 class="tiss-h4 tiss-mt-4 tiss-mb-3">狀態顏色</h3>
+            <div class="color-grid">
+                <div class="color-item" style="background-color: #28A745;">
+                    <div>安全/成功</div>
+                    <div>#28A745</div>
+                </div>
+                <div class="color-item" style="background-color: #FFA500;">
+                    <div>警示</div>
+                    <div>#FFA500</div>
+                </div>
+                <div class="color-item" style="background-color: #DC3545;">
+                    <div>錯誤/危險</div>
+                    <div>#DC3545</div>
+                </div>
+                <div class="color-item" style="background-color: #17A2B8;">
+                    <div>資訊</div>
+                    <div>#17A2B8</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 排版 -->
+        <section id="typography" class="section component-section">
+            <h2 class="component-title">排版</h2>
+            <div class="component-grid">
+                <div class="component-item">
+                    <h1 class="tiss-h1">標題 1</h1>
+                    <div class="code-block">
+                        tiss-h1
+                        <button class="copy-btn" data-copy="tiss-h1"><i class="far fa-copy"></i></button>
+                    </div>
+                </div>
+                <div class="component-item">
+                    <h2 class="tiss-h2">標題 2</h2>
+                    <div class="code-block">
+                        tiss-h2
+                        <button class="copy-btn" data-copy="tiss-h2"><i class="far fa-copy"></i></button>
+                    </div>
+                </div>
+                <div class="component-item">
+                    <h3 class="tiss-h3">標題 3</h3>
+                    <div class="code-block">
+                        tiss-h3
+                        <button class="copy-btn" data-copy="tiss-h3"><i class="far fa-copy"></i></button>
+                    </div>
+                </div>
+                <div class="component-item">
+                    <h4 class="tiss-h4">標題 4</h4>
+                    <div class="code-block">
+                        tiss-h4
+                        <button class="copy-btn" data-copy="tiss-h4"><i class="far fa-copy"></i></button>
+                    </div>
+                </div>
+                <div class="component-item">
+                    <h5 class="tiss-h5">標題 5</h5>
+                    <div class="code-block">
+                        tiss-h5
+                        <button class="copy-btn" data-copy="tiss-h5"><i class="far fa-copy"></i></button>
+                    </div>
+                </div>
+                <div class="component-item">
+                    <h6 class="tiss-h6">標題 6</h6>
+                    <div class="code-block">
+                        tiss-h6
+                        <button class="copy-btn" data-copy="tiss-h6"><i class="far fa-copy"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="component-item tiss-mt-3">
+                <p>這是一段示範文字，使用預設的字體大小和行高。這是第二行文字，用來展示行高效果。</p>
+                <div class="code-block">
+                    p
+                    <button class="copy-btn" data-copy="p"><i class="far fa-copy"></i></button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 元件 -->
+        <section id="components" class="section component-section">
+            <h2 class="component-title">元件</h2>
+            
+            <!-- 分頁導航 -->
+            <div class="tiss-page-nav">
+                <button class="tiss-page-nav-item active" data-page="buttons">按鈕</button>
+                <button class="tiss-page-nav-item" data-page="forms">表單</button>
+                <button class="tiss-page-nav-item" data-page="cards">卡片</button>
+                <button class="tiss-page-nav-item" data-page="charts">圖表</button>
+                <button class="tiss-page-nav-item" data-page="alerts">提示訊息</button>
+                <button class="tiss-page-nav-item" data-page="badges">標籤</button>
+                <button class="tiss-page-nav-item" data-page="tables">表格</button>
+                <button class="tiss-page-nav-item" data-page="modals">彈跳視窗</button>
+                <button class="tiss-page-nav-item" data-page="checkboxes">核取方塊</button>
+                <button class="tiss-page-nav-item" data-page="collapsible">可折疊面板</button>
+                <button class="tiss-page-nav-item" data-page="progress">進度條</button>
+                <button class="tiss-page-nav-item" data-page="tabs">分頁標籤</button>
+                <button class="tiss-page-nav-item" data-page="toggles">開關</button>
+            </div>
+
+            <!-- 按鈕頁面 -->
+            <div id="buttons-page" class="tiss-page-content active">
+                <h3 class="tiss-h4 tiss-mb-3">按鈕元件</h3>
+                <div class="component-grid">
+                    <div class="component-item">
+                        <button class="tiss-btn tiss-btn-primary">主要按鈕</button>
+                        <div class="code-block">
+                            tiss-btn tiss-btn-primary
+                            <button class="copy-btn" data-copy="tiss-btn tiss-btn-primary"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <button class="tiss-btn tiss-btn-secondary">次要按鈕</button>
+                        <div class="code-block">
+                            tiss-btn tiss-btn-secondary
+                            <button class="copy-btn" data-copy="tiss-btn tiss-btn-secondary"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <button class="tiss-btn tiss-btn-accent">強調按鈕</button>
+                        <div class="code-block">
+                            tiss-btn tiss-btn-accent
+                            <button class="copy-btn" data-copy="tiss-btn tiss-btn-accent"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <button class="tiss-btn tiss-btn-outline tiss-btn-primary">外框按鈕</button>
+                        <div class="code-block">
+                            tiss-btn tiss-btn-outline tiss-btn-primary
+                            <button class="copy-btn" data-copy="tiss-btn tiss-btn-outline tiss-btn-primary"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="component-grid">
+                    <div class="component-item">
+                        <button class="tiss-btn tiss-btn-primary tiss-btn-sm">小型按鈕</button>
+                        <div class="code-block">
+                            tiss-btn tiss-btn-primary tiss-btn-sm
+                            <button class="copy-btn" data-copy="tiss-btn tiss-btn-primary tiss-btn-sm"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <button class="tiss-btn tiss-btn-primary tiss-btn-lg">大型按鈕</button>
+                        <div class="code-block">
+                            tiss-btn tiss-btn-primary tiss-btn-lg
+                            <button class="copy-btn" data-copy="tiss-btn tiss-btn-primary tiss-btn-lg"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 表單頁面 -->
+            <div id="forms-page" class="tiss-page-content">
+                <h3 class="tiss-h4 tiss-mb-3">表單元件</h3>
+                <div class="component-grid">
+                    <div class="component-item">
+                        <div class="tiss-form-group">
+                            <label class="tiss-label">文字輸入框</label>
+                            <input type="text" class="tiss-input" placeholder="請輸入文字">
+                            <div class="code-block">
+                                tiss-input
+                                <button class="copy-btn" data-copy="tiss-input"><i class="far fa-copy"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <div class="tiss-form-group">
+                            <label class="tiss-label">下拉選單</label>
+                            <select class="tiss-select">
+                                <option>選項 1</option>
+                                <option>選項 2</option>
+                                <option>選項 3</option>
+                            </select>
+                            <div class="code-block">
+                                tiss-select
+                                <button class="copy-btn" data-copy="tiss-select"><i class="far fa-copy"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <div class="tiss-form-group">
+                            <label class="tiss-label">多行文字框</label>
+                            <textarea class="tiss-textarea" placeholder="請輸入多行文字"></textarea>
+                            <div class="code-block">
+                                tiss-textarea
+                                <button class="copy-btn" data-copy="tiss-textarea"><i class="far fa-copy"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <div class="tiss-form-group">
+                            <input type="checkbox" id="checkbox1" class="tiss-checkbox">
+                            <label for="checkbox1">核取方塊</label>
+                            <div class="code-block">
+                                tiss-checkbox
+                                <button class="copy-btn" data-copy="tiss-checkbox"><i class="far fa-copy"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <div class="tiss-form-group">
+                            <input type="radio" id="radio1" class="tiss-radio" name="radio">
+                            <label for="radio1">單選按鈕</label>
+                            <div class="code-block">
+                                tiss-radio
+                                <button class="copy-btn" data-copy="tiss-radio"><i class="far fa-copy"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 卡片頁面 -->
+            <div id="cards-page" class="tiss-page-content">
+                <h3 class="tiss-h4 tiss-mb-3">卡片</h3>
+                <div class="component-grid">
+                    <div class="component-item">
+                        <div class="tiss-card">
+                            <div class="tiss-card-header">基本卡片</div>
+                            <div class="tiss-card-body">
+                                <h5 class="tiss-h5">卡片標題</h5>
+                                <p>這是一個基本的卡片元件，可以包含標題、內容和頁尾。</p>
+                            </div>
+                            <div class="tiss-card-footer">卡片頁尾</div>
+                        </div>
+                        <div class="code-block">
+                            tiss-card<br>
+                            tiss-card-header<br>
+                            tiss-card-body<br>
+                            tiss-card-footer
+                            <button class="copy-btn" data-copy="tiss-card tiss-card-header tiss-card-body tiss-card-footer"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <div class="tiss-card tiss-card-hover">
+                            <div class="tiss-card-body">
+                                <h5 class="tiss-h5">懸停效果卡片</h5>
+                                <p>滑鼠懸停時會有陰影效果。</p>
+                            </div>
+                        </div>
+                        <div class="code-block">
+                            tiss-card tiss-card-hover
+                            <button class="copy-btn" data-copy="tiss-card tiss-card-hover"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <div class="tiss-card tiss-card-bordered">
+                            <div class="tiss-card-body">
+                                <h5 class="tiss-h5">邊框卡片</h5>
+                                <p>帶有邊框的卡片樣式。</p>
+                            </div>
+                        </div>
+                        <div class="code-block">
+                            tiss-card tiss-card-bordered
+                            <button class="copy-btn" data-copy="tiss-card tiss-card-bordered"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 圖表頁面 -->
+            <div id="charts-page" class="tiss-page-content">
+                <div class="component-grid">
+                    <div class="component-item">
+                        <h3 class="tiss-h5 tiss-mb-3">折線圖</h3>
+                        <div class="tiss-chart-container">
+                            <canvas id="lineChart"></canvas>
+                        </div>
+                        <div class="code-block">
+                            tiss-chart-container
+                            <button class="copy-btn" data-copy="tiss-chart-container"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <h3 class="tiss-h5 tiss-mb-3">長條圖</h3>
+                        <div class="tiss-chart-container">
+                            <canvas id="barChart"></canvas>
+                        </div>
+                        <div class="code-block">
+                            tiss-chart-container
+                            <button class="copy-btn" data-copy="tiss-chart-container"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <h3 class="tiss-h5 tiss-mb-3">圓餅圖</h3>
+                        <div class="tiss-chart-container">
+                            <canvas id="pieChart"></canvas>
+                        </div>
+                        <div class="code-block">
+                            tiss-chart-container
+                            <button class="copy-btn" data-copy="tiss-chart-container"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <h3 class="tiss-h5 tiss-mb-3">雷達圖</h3>
+                        <div class="tiss-chart-container">
+                            <canvas id="radarChart"></canvas>
+                        </div>
+                        <div class="code-block">
+                            tiss-chart-container
+                            <button class="copy-btn" data-copy="tiss-chart-container"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 其他元件頁面 -->
+            <div id="alerts-page" class="tiss-page-content">
+                <h3 class="tiss-h4 tiss-mb-3">提示訊息</h3>
+                <div class="component-grid">
+                    <div class="component-item">
+                        <div class="tiss-alert tiss-alert-primary">主要提示訊息</div>
+                        <div class="code-block">
+                            tiss-alert tiss-alert-primary
+                            <button class="copy-btn" data-copy="tiss-alert tiss-alert-primary"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <div class="tiss-alert tiss-alert-secondary">次要提示訊息</div>
+                        <div class="code-block">
+                            tiss-alert tiss-alert-secondary
+                            <button class="copy-btn" data-copy="tiss-alert tiss-alert-secondary"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <div class="tiss-alert tiss-alert-accent">強調提示訊息</div>
+                        <div class="code-block">
+                            tiss-alert tiss-alert-accent
+                            <button class="copy-btn" data-copy="tiss-alert tiss-alert-accent"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <div class="tiss-alert tiss-alert-success">成功提示訊息</div>
+                        <div class="code-block">
+                            tiss-alert tiss-alert-success
+                            <button class="copy-btn" data-copy="tiss-alert tiss-alert-success"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <div class="tiss-alert tiss-alert-danger">錯誤提示訊息</div>
+                        <div class="code-block">
+                            tiss-alert tiss-alert-danger
+                            <button class="copy-btn" data-copy="tiss-alert tiss-alert-danger"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <div class="tiss-alert tiss-alert-warning">警告提示訊息</div>
+                        <div class="code-block">
+                            tiss-alert tiss-alert-warning
+                            <button class="copy-btn" data-copy="tiss-alert tiss-alert-warning"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <div class="tiss-alert tiss-alert-info">資訊提示訊息</div>
+                        <div class="code-block">
+                            tiss-alert tiss-alert-info
+                            <button class="copy-btn" data-copy="tiss-alert tiss-alert-info"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="badges-page" class="tiss-page-content">
+                <h3 class="tiss-h4 tiss-mb-3">標籤</h3>
+                <div class="component-grid">
+                    <div class="component-item">
+                        <span class="tiss-badge tiss-badge-primary">主要</span>
+                        <div class="code-block">
+                            tiss-badge tiss-badge-primary
+                            <button class="copy-btn" data-copy="tiss-badge tiss-badge-primary"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <span class="tiss-badge tiss-badge-secondary">次要</span>
+                        <div class="code-block">
+                            tiss-badge tiss-badge-secondary
+                            <button class="copy-btn" data-copy="tiss-badge tiss-badge-secondary"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <span class="tiss-badge tiss-badge-accent">強調</span>
+                        <div class="code-block">
+                            tiss-badge tiss-badge-accent
+                            <button class="copy-btn" data-copy="tiss-badge tiss-badge-accent"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <span class="tiss-badge tiss-badge-success">成功</span>
+                        <div class="code-block">
+                            tiss-badge tiss-badge-success
+                            <button class="copy-btn" data-copy="tiss-badge tiss-badge-success"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <span class="tiss-badge tiss-badge-danger">錯誤</span>
+                        <div class="code-block">
+                            tiss-badge tiss-badge-danger
+                            <button class="copy-btn" data-copy="tiss-badge tiss-badge-danger"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <span class="tiss-badge tiss-badge-warning">警告</span>
+                        <div class="code-block">
+                            tiss-badge tiss-badge-warning
+                            <button class="copy-btn" data-copy="tiss-badge tiss-badge-warning"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <span class="tiss-badge tiss-badge-info">資訊</span>
+                        <div class="code-block">
+                            tiss-badge tiss-badge-info
+                            <button class="copy-btn" data-copy="tiss-badge tiss-badge-info"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="tables-page" class="tiss-page-content">
+                <h3 class="tiss-h4 tiss-mb-3">表格</h3>
+                <div class="component-item">
+                    <table class="tiss-table">
+                        <thead>
+                            <tr>
+                                <th>標題 1</th>
+                                <th>標題 2</th>
+                                <th>標題 3</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>內容 1</td>
+                                <td>內容 2</td>
+                                <td>內容 3</td>
+                            </tr>
+                            <tr>
+                                <td>內容 4</td>
+                                <td>內容 5</td>
+                                <td>內容 6</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="code-block">
+                        tiss-table
+                        <button class="copy-btn" data-copy="tiss-table"><i class="far fa-copy"></i></button>
+                    </div>
+                </div>
+                <div class="component-item tiss-mt-3">
+                    <table class="tiss-table tiss-table-striped">
+                        <thead>
+                            <tr>
+                                <th>標題 1</th>
+                                <th>標題 2</th>
+                                <th>標題 3</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>內容 1</td>
+                                <td>內容 2</td>
+                                <td>內容 3</td>
+                            </tr>
+                            <tr>
+                                <td>內容 4</td>
+                                <td>內容 5</td>
+                                <td>內容 6</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="code-block">
+                        tiss-table tiss-table-striped
+                        <button class="copy-btn" data-copy="tiss-table tiss-table-striped"><i class="far fa-copy"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div id="modals-page" class="tiss-page-content">
+                <h3 class="tiss-h4 tiss-mb-3">彈跳視窗</h3>
+                <div class="component-item">
+                    <button class="tiss-btn tiss-btn-primary" onclick="openModal()">開啟彈跳視窗</button>
+                    <div class="code-block">
+                        tiss-modal-backdrop<br>
+                        tiss-modal<br>
+                        tiss-modal-header<br>
+                        tiss-modal-body<br>
+                        tiss-modal-footer
+                        <button class="copy-btn" data-copy="tiss-modal-backdrop tiss-modal tiss-modal-header tiss-modal-body tiss-modal-footer"><i class="far fa-copy"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div id="checkboxes-page" class="tiss-page-content">
+                <h3 class="tiss-h4 tiss-mb-3">核取方塊</h3>
+                <div class="component-grid">
+                    <div class="component-item">
+                        <div class="tiss-checkbox-group">
+                            <label class="tiss-checkbox-label">
+                                <input type="checkbox" class="tiss-checkbox">
+                                <span class="tiss-checkbox-custom"></span>
+                                基本核取方塊
+                            </label>
+                        </div>
+                        <div class="code-block">
+                            tiss-checkbox
+                            <button class="copy-btn" data-copy="tiss-checkbox"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <div class="tiss-checkbox-group">
+                            <label class="tiss-checkbox-label">
+                                <input type="checkbox" class="tiss-checkbox" checked>
+                                <span class="tiss-checkbox-custom"></span>
+                                已選取核取方塊
+                            </label>
+                        </div>
+                        <div class="code-block">
+                            tiss-checkbox
+                            <button class="copy-btn" data-copy="tiss-checkbox"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="collapsible-page" class="tiss-page-content">
+                <h3 class="tiss-h4 tiss-mb-3">可折疊面板</h3>
+                <div class="component-item">
+                    <div class="tiss-collapsible">
+                        <button class="tiss-collapsible-header">
+                            可折疊面板標題
+                            <span class="tiss-collapsible-icon">▼</span>
+                        </button>
+                        <div class="tiss-collapsible-content">
+                            <div class="tiss-collapsible-body">
+                                這是可折疊面板的內容區域。點擊標題可以展開或收起內容。
+                            </div>
+                        </div>
+                    </div>
+                    <div class="code-block">
+                        tiss-collapsible
+                        <button class="copy-btn" data-copy="tiss-collapsible"><i class="far fa-copy"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div id="progress-page" class="tiss-page-content">
+                <h3 class="tiss-h4 tiss-mb-3">進度條</h3>
+                <div class="component-grid">
+                    <div class="component-item">
+                        <h3 class="tiss-h5 tiss-mb-3">基本進度條</h3>
+                        <div class="tiss-progress">
+                            <div class="tiss-progress-bar" style="width: 25%">25%</div>
+                        </div>
+                        <div class="code-block">
+                            tiss-progress
+                            <button class="copy-btn" data-copy="tiss-progress"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <h3 class="tiss-h5 tiss-mb-3">條紋進度條</h3>
+                        <div class="tiss-progress tiss-progress-striped">
+                            <div class="tiss-progress-bar" style="width: 50%">50%</div>
+                        </div>
+                        <div class="code-block">
+                            tiss-progress-striped
+                            <button class="copy-btn" data-copy="tiss-progress-striped"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <h3 class="tiss-h5 tiss-mb-3">小型進度條</h3>
+                        <div class="tiss-progress tiss-progress-sm">
+                            <div class="tiss-progress-bar" style="width: 75%">75%</div>
+                        </div>
+                        <div class="code-block">
+                            tiss-progress-sm
+                            <button class="copy-btn" data-copy="tiss-progress-sm"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="tabs-page" class="tiss-page-content">
+                <h3 class="tiss-h4 tiss-mb-3">分頁標籤</h3>
+                <div class="component-item">
+                    <div class="tiss-tabs">
+                        <div class="tiss-tabs-nav">
+                            <button class="tiss-tab-item tiss-tab-active">標籤 1</button>
+                            <button class="tiss-tab-item">標籤 2</button>
+                            <button class="tiss-tab-item">標籤 3</button>
+                        </div>
+                        <div class="tiss-tabs-content">
+                            <div class="tiss-tab-pane tiss-tab-active">
+                                標籤 1 的內容
+                            </div>
+                            <div class="tiss-tab-pane">
+                                標籤 2 的內容
+                            </div>
+                            <div class="tiss-tab-pane">
+                                標籤 3 的內容
+                            </div>
+                        </div>
+                    </div>
+                    <div class="code-block">
+                        tiss-tabs
+                        <button class="copy-btn" data-copy="tiss-tabs"><i class="far fa-copy"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div id="toggles-page" class="tiss-page-content">
+                <h3 class="tiss-h4 tiss-mb-3">開關</h3>
+                <div class="component-grid">
+                    <div class="component-item">
+                        <h3 class="tiss-h5 tiss-mb-3">基本開關</h3>
+                        <label class="tiss-toggle">
+                            <input type="checkbox" class="tiss-toggle-input">
+                            <span class="tiss-toggle-slider"></span>
+                        </label>
+                        <div class="code-block">
+                            tiss-toggle
+                            <button class="copy-btn" data-copy="tiss-toggle"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <div class="component-item">
+                        <h3 class="tiss-h5 tiss-mb-3">已開啟開關</h3>
+                        <label class="tiss-toggle">
+                            <input type="checkbox" class="tiss-toggle-input" checked>
+                            <span class="tiss-toggle-slider"></span>
+                        </label>
+                        <div class="code-block">
+                            tiss-toggle
+                            <button class="copy-btn" data-copy="tiss-toggle"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 工具類別 -->
+        <section id="utilities" class="section component-section">
+            <h2 class="component-title">工具類別</h2>
+            <h3 class="tiss-h4 tiss-mb-3">文字顏色</h3>
+            <div class="component-grid">
+                <div class="component-item">
+                    <div class="tiss-text-primary tiss-p-3 tiss-rounded-md tiss-shadow-sm">主要文字顏色</div>
+                    <div class="code-block">
+                        tiss-text-primary
+                        <button class="copy-btn" data-copy="tiss-text-primary"><i class="far fa-copy"></i></button>
+                    </div>
+                </div>
+                <div class="component-item">
+                    <div class="tiss-text-secondary tiss-p-3 tiss-rounded-md tiss-shadow-sm">次要文字顏色</div>
+                    <div class="code-block">
+                        tiss-text-secondary
+                        <button class="copy-btn" data-copy="tiss-text-secondary"><i class="far fa-copy"></i></button>
+                    </div>
+                </div>
+                <div class="component-item">
+                    <div class="tiss-text-accent tiss-p-3 tiss-rounded-md tiss-shadow-sm">強調文字顏色</div>
+                    <div class="code-block">
+                        tiss-text-accent
+                        <button class="copy-btn" data-copy="tiss-text-accent"><i class="far fa-copy"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="tiss-h4 tiss-mt-4 tiss-mb-3">背景顏色</h3>
+            <div class="component-grid">
+                <div class="component-item">
+                    <div class="tiss-bg-primary tiss-p-3 tiss-rounded-md">主要背景顏色</div>
+                    <div class="code-block">
+                        tiss-bg-primary
+                        <button class="copy-btn" data-copy="tiss-bg-primary"><i class="far fa-copy"></i></button>
+                    </div>
+                </div>
+                <div class="component-item">
+                    <div class="tiss-bg-secondary tiss-p-3 tiss-rounded-md">次要背景顏色</div>
+                    <div class="code-block">
+                        tiss-bg-secondary
+                        <button class="copy-btn" data-copy="tiss-bg-secondary"><i class="far fa-copy"></i></button>
+                    </div>
+                </div>
+                <div class="component-item">
+                    <div class="tiss-bg-accent tiss-p-3 tiss-rounded-md">強調背景顏色</div>
+                    <div class="code-block">
+                        tiss-bg-accent
+                        <button class="copy-btn" data-copy="tiss-bg-accent"><i class="far fa-copy"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="tiss-h4 tiss-mt-4 tiss-mb-3">圓角</h3>
+            <div class="component-grid">
+                <div class="component-item">
+                    <div class="tiss-bg-primary tiss-p-3 tiss-rounded-sm">小型圓角</div>
+                    <div class="code-block">
+                        tiss-rounded-sm
+                        <button class="copy-btn" data-copy="tiss-rounded-sm"><i class="far fa-copy"></i></button>
+                    </div>
+                </div>
+                <div class="component-item">
+                    <div class="tiss-bg-primary tiss-p-3 tiss-rounded-md">中型圓角</div>
+                    <div class="code-block">
+                        tiss-rounded-md
+                        <button class="copy-btn" data-copy="tiss-rounded-md"><i class="far fa-copy"></i></button>
+                    </div>
+                </div>
+                <div class="component-item">
+                    <div class="tiss-bg-primary tiss-p-3 tiss-rounded-lg">大型圓角</div>
+                    <div class="code-block">
+                        tiss-rounded-lg
+                        <button class="copy-btn" data-copy="tiss-rounded-lg"><i class="far fa-copy"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="tiss-h4 tiss-mt-4 tiss-mb-3">陰影</h3>
+            <div class="component-grid">
+                <div class="component-item">
+                    <div class="tiss-bg-white tiss-p-3 tiss-rounded-md tiss-shadow-sm">小型陰影</div>
+                    <div class="code-block">
+                        tiss-shadow-sm
+                        <button class="copy-btn" data-copy="tiss-shadow-sm"><i class="far fa-copy"></i></button>
+                    </div>
+                </div>
+                <div class="component-item">
+                    <div class="tiss-bg-white tiss-p-3 tiss-rounded-md tiss-shadow-md">中型陰影</div>
+                    <div class="code-block">
+                        tiss-shadow-md
+                        <button class="copy-btn" data-copy="tiss-shadow-md"><i class="far fa-copy"></i></button>
+                    </div>
+                </div>
+                <div class="component-item">
+                    <div class="tiss-bg-white tiss-p-3 tiss-rounded-md tiss-shadow-lg">大型陰影</div>
+                    <div class="code-block">
+                        tiss-shadow-lg
+                        <button class="copy-btn" data-copy="tiss-shadow-lg"><i class="far fa-copy"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="tiss-h4 tiss-mt-4 tiss-mb-3">間距</h3>
+            <div class="component-grid">
+                <div class="component-item">
+                    <div class="tiss-bg-primary tiss-p-1">內邊距 1</div>
+                    <div class="code-block">
+                        tiss-p-1
+                        <button class="copy-btn" data-copy="tiss-p-1"><i class="far fa-copy"></i></button>
+                    </div>
+                </div>
+                <div class="component-item">
+                    <div class="tiss-bg-primary tiss-p-3">內邊距 3</div>
+                    <div class="code-block">
+                        tiss-p-3
+                        <button class="copy-btn" data-copy="tiss-p-3"><i class="far fa-copy"></i></button>
+                    </div>
+                </div>
+                <div class="component-item">
+                    <div class="tiss-bg-primary tiss-p-5">內邊距 5</div>
+                    <div class="code-block">
+                        tiss-p-5
+                        <button class="copy-btn" data-copy="tiss-p-5"><i class="far fa-copy"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="component-grid tiss-mt-3">
+                <div class="component-item">
+                    <div class="tiss-bg-primary tiss-mt-1">上邊距 1</div>
+                    <div class="code-block">
+                        tiss-mt-1
+                        <button class="copy-btn" data-copy="tiss-mt-1"><i class="far fa-copy"></i></button>
+                    </div>
+                </div>
+                <div class="component-item">
+                    <div class="tiss-bg-primary tiss-mt-3">上邊距 3</div>
+                    <div class="code-block">
+                        tiss-mt-3
+                        <button class="copy-btn" data-copy="tiss-mt-3"><i class="far fa-copy"></i></button>
+                    </div>
+                </div>
+                <div class="component-item">
+                    <div class="tiss-bg-primary tiss-mt-5">上邊距 5</div>
+                    <div class="code-block">
+                        tiss-mt-5
+                        <button class="copy-btn" data-copy="tiss-mt-5"><i class="far fa-copy"></i></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 使用方法 -->
+        <section id="usage" class="section component-section">
+            <h2 class="component-title">使用方法</h2>
+            
+            <h3 class="tiss-h4 tiss-mb-3">1. 下載必要檔案</h3>
+            <div class="component-item">
+                <p>您需要下載以下檔案：</p>
+                <ul class="tiss-mb-3">
+                    <li><code>tiss.scss</code> - 主要樣式檔案</li>
+                    <li><code>index.html</code> - 設計系統展示頁面（可選）</li>
+                </ul>
+                <div class="code-block">
+                    tiss.scss
+                    <button class="copy-btn" data-copy="tiss.scss"><i class="far fa-copy"></i></button>
+                </div>
+            </div>
+
+            <h3 class="tiss-h4 tiss-mt-4 tiss-mb-3">2. 引入必要依賴</h3>
+            <div class="component-item">
+                <p>在您的 HTML 檔案中引入以下依賴：</p>
+                <div class="code-block">
+                    &lt;link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet"&gt;<br>
+                    &lt;link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"&gt;<br>
+                    &lt;link rel="stylesheet" href="path/to/tiss.scss"&gt;
+                    <button class="copy-btn" data-copy='<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="path/to/tiss.scss">'><i class="far fa-copy"></i></button>
+                </div>
+            </div>
+
+            <h3 class="tiss-h4 tiss-mt-4 tiss-mb-3">3. 使用元件</h3>
+            <div class="component-item">
+                <p>直接使用對應的 class 名稱即可套用樣式：</p>
+                <div class="code-block">
+                    &lt;button class="tiss-btn tiss-btn-primary"&gt;主要按鈕&lt;/button&gt;<br>
+                    &lt;div class="tiss-alert tiss-alert-success"&gt;成功提示訊息&lt;/div&gt;<br>
+                    &lt;div class="tiss-card"&gt;卡片內容&lt;/div&gt;
+                    <button class="copy-btn" data-copy='<button class="tiss-btn tiss-btn-primary">主要按鈕</button>
+<div class="tiss-alert tiss-alert-success">成功提示訊息</div>
+<div class="tiss-card">卡片內容</div>'><i class="far fa-copy"></i></button>
+                </div>
+            </div>
+
+            <h3 class="tiss-h4 tiss-mt-4 tiss-mb-3">4. 自訂主題顏色</h3>
+            <div class="component-item">
+                <p>您可以透過修改 CSS 變量來自訂主題顏色：</p>
+                <div class="code-block">
+                    :root {<br>
+                    &nbsp;&nbsp;--tiss-blue: #004D9F;<br>
+                    &nbsp;&nbsp;--tiss-green: #00A886;<br>
+                    &nbsp;&nbsp;--tiss-dark-blue: #003366;<br>
+                    &nbsp;&nbsp;/* 其他顏色變量 */<br>
+                    }
+                    <button class="copy-btn" data-copy=':root {
+    --tiss-blue: #004D9F;
+    --tiss-green: #00A886;
+    --tiss-dark-blue: #003366;
+    /* 其他顏色變量 */
+}'><i class="far fa-copy"></i></button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 彈跳視窗範本 -->
+    <div class="tiss-modal-backdrop" id="modal">
+        <div class="tiss-modal">
+            <div class="tiss-modal-header">
+                <h3 class="tiss-modal-title">彈跳視窗標題</h3>
+                <button class="tiss-modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="tiss-modal-body">
+                <p>這是彈跳視窗的內容區域。</p>
+            </div>
+            <div class="tiss-modal-footer">
+                <button class="tiss-btn tiss-btn-outline tiss-btn-primary" onclick="closeModal()">取消</button>
+                <button class="tiss-btn tiss-btn-primary">確認</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 複製成功提示 -->
+    <div class="copy-toast" id="copyToast">已複製到剪貼簿</div>
+
+    <script>
+        function openModal() {
+            const modal = document.getElementById('modal');
+            modal.classList.add('tiss-modal-show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            modal.classList.remove('tiss-modal-show');
+            document.body.style.overflow = '';
+        }
+
+        // 點擊背景關閉彈跳視窗
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // 平滑滾動
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // 複製功能
+        document.querySelectorAll('.copy-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const textToCopy = this.getAttribute('data-copy');
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    // 顯示複製成功提示
+                    const toast = document.getElementById('copyToast');
+                    toast.style.display = 'block';
+                    
+                    // 2.5秒後隱藏提示
+                    setTimeout(() => {
+                        toast.style.display = 'none';
+                    }, 2500);
+                }).catch(err => {
+                    console.error('複製失敗:', err);
+                });
+            });
+        });
+
+        // 分頁切換功能
+        document.querySelectorAll('.tiss-page-nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                // 更新導航項目的狀態
+                document.querySelectorAll('.tiss-page-nav-item').forEach(nav => {
+                    nav.classList.remove('active');
+                });
+                item.classList.add('active');
+
+                // 更新內容頁面的顯示
+                const pageId = item.getAttribute('data-page') + '-page';
+                document.querySelectorAll('.tiss-page-content').forEach(page => {
+                    page.classList.remove('active');
+                });
+                document.getElementById(pageId).classList.add('active');
+            });
+        });
+
+        // 圖表初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 折線圖 - 心率變化
+            const lineCtx = document.getElementById('lineChart').getContext('2d');
+            new Chart(lineCtx, {
+                type: 'line',
+                data: {
+                    labels: ['熱身', '5分鐘', '10分鐘', '15分鐘', '20分鐘', '25分鐘', '30分鐘', '緩和'],
+                    datasets: [{
+                        label: '心率 (BPM)',
+                        data: [75, 120, 145, 155, 160, 165, 170, 90],
+                        borderColor: '#004D9F',
+                        tension: 0.4,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '運動過程中心率變化'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 60,
+                            max: 180,
+                            title: {
+                                display: true,
+                                text: '心率 (BPM)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 長條圖 - 每週運動時間分配
+            const barCtx = document.getElementById('barChart').getContext('2d');
+            new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['有氧運動', '肌力訓練', '伸展運動', '核心訓練', '平衡訓練', '恢復日'],
+                    datasets: [{
+                        label: '每週運動時間 (小時)',
+                        data: [4, 3, 2, 2.5, 1.5, 1],
+                        backgroundColor: [
+                            '#004D9F',
+                            '#00A886',
+                            '#FACB00',
+                            '#F29027',
+                            '#00B1AD',
+                            '#DC3545'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '每週運動時間分配'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '時間 (小時)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 圓餅圖 - 運動強度分布
+            const pieCtx = document.getElementById('pieChart').getContext('2d');
+            new Chart(pieCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['低強度', '中強度', '高強度', '恢復'],
+                    datasets: [{
+                        data: [30, 45, 15, 10],
+                        backgroundColor: [
+                            '#00A886',
+                            '#004D9F',
+                            '#F29027',
+                            '#FACB00'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '運動強度分布'
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // 雷達圖 - 運動能力評估
+            const radarCtx = document.getElementById('radarChart').getContext('2d');
+            new Chart(radarCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['心肺耐力', '肌力', '柔軟度', '平衡感', '協調性', '爆發力'],
+                    datasets: [{
+                        label: '目前水準',
+                        data: [85, 75, 90, 80, 85, 70],
+                        backgroundColor: 'rgba(0, 77, 159, 0.2)',
+                        borderColor: '#004D9F',
+                        pointBackgroundColor: '#004D9F'
+                    }, {
+                        label: '目標水準',
+                        data: [90, 85, 95, 85, 90, 80],
+                        backgroundColor: 'rgba(0, 168, 134, 0.2)',
+                        borderColor: '#00A886',
+                        pointBackgroundColor: '#00A886'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '運動能力評估'
+                        }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                stepSize: 20
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // 側邊欄收合功能
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
+                const icon = sidebarToggle.querySelector('i');
+                icon.classList.toggle('fa-bars');
+                icon.classList.toggle('fa-times');
+            });
+        });
+    </script>
+</body>
+</html> 

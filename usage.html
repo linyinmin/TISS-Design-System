@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TISS Design System - 使用方法</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="scss/tiss.scss">
+    <style>
+        :root {
+            --tiss-blue: #004D9F;
+            --tiss-dark-blue: #003366;
+            --tiss-green: #00A886;
+            --tiss-yellow: #FACB00;
+            --tiss-orange: #F29027;
+            --tiss-cyan: #00B1AD;
+            --tiss-error: #DC3545;
+            --tiss-warning: #FFA500;
+            --tiss-success: #28A745;
+            --tiss-info: #17A2B8;
+            --tiss-gray-100: #f8f9fa;
+            --tiss-gray-200: #e9ecef;
+            --tiss-gray-300: #dee2e6;
+            --tiss-gray-400: #ced4da;
+            --tiss-gray-500: #adb5bd;
+            --tiss-gray-600: #6c757d;
+            --tiss-gray-700: #495057;
+            --tiss-gray-800: #343a40;
+            --tiss-gray-900: #212529;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--tiss-gray-100);
+            color: var(--tiss-gray-900);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            color: var(--tiss-blue);
+            margin-bottom: 1rem;
+        }
+
+        .section {
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .section h2 {
+            color: var(--tiss-dark-blue);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--tiss-blue);
+        }
+
+        .code-block {
+            background: var(--tiss-gray-100);
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+            font-family: monospace;
+            position: relative;
+        }
+
+        .download-btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: var(--tiss-blue);
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 1rem 0;
+            transition: background-color 0.3s;
+        }
+
+        .download-btn:hover {
+            background-color: var(--tiss-dark-blue);
+        }
+
+        .note {
+            background-color: var(--tiss-info);
+            color: white;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+        
+        /* 側邊欄樣式 */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            height: 100vh;
+            background: var(--tiss-gray-100);
+            padding: 2rem;
+            overflow-y: auto;
+            border-right: 1px solid var(--tiss-gray-300);
+            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar.collapsed {
+            width: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .sidebar-toggle {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1000;
+            background: var(--tiss-blue);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-toggle:hover {
+            background: var(--tiss-dark-blue);
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+            transition: margin-left 0.3s ease;
+            width: calc(100% - 250px);
+        }
+        
+        .main-content.expanded {
+            margin-left: 0;
+            width: 100%;
+        }
+        
+        .nav-link {
+            display: block;
+            padding: 0.75rem 0;
+            color: var(--tiss-gray-700);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            padding-left: 1rem;
+        }
+        
+        .nav-link:hover {
+            color: var(--tiss-blue);
+            border-left: 3px solid var(--tiss-blue);
+            background-color: rgba(119, 203, 242, 0.1);
+        }
+        
+        /* 確保在小螢幕上也能正確顯示 */
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+                width: 100%;
+            }
+            
+            .sidebar {
+                width: 0;
+                padding: 0;
+                overflow: hidden;
+            }
+            
+            .sidebar-toggle {
+                display: flex;
+            }
+        }
+
+        .sidebar-logo {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            border-bottom: 1px solid var(--tiss-gray-300);
+        }
+        
+        .logo-img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- 側邊欄收合按鈕 -->
+    <button class="sidebar-toggle" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- 側邊導航 -->
+    <nav class="sidebar">
+        <div class="sidebar-logo">
+            <img src="Tiss Logo-h.png" alt="TISS Logo" class="logo-img">
+        </div>
+        <nav>
+            <a href="index.html#colors" class="nav-link">顏色</a>
+            <a href="index.html#typography" class="nav-link">字體</a>
+            <a href="index.html#components" class="nav-link">元件</a>
+            <a href="index.html#utilities" class="nav-link">工具類</a>
+            <a href="charts.html" class="nav-link">圖表</a>
+            <a href="usage.html" class="nav-link">使用方法</a>
+        </nav>
+    </nav>
+
+    <!-- 主要內容 -->
+    <main class="main-content">
+        <div class="container">
+            <header class="header">
+                <h1>TISS Design System 使用方法</h1>
+                <p>這份文件說明如何將 TISS Design System 整合到您的專案中</p>
+            </header>
+
+            <section class="section">
+                <h2>1. 下載必要檔案</h2>
+                <p>您需要下載以下檔案：</p>
+                <ul>
+                    <li><code>tiss.scss</code> - 主要樣式檔案</li>
+                </ul>
+                <a href="scss/tiss.scss" class="download-btn" download>
+                    <i class="fas fa-download"></i> 下載 tiss.scss
+                </a>
+            </section>
+
+            <section class="section">
+                <h2>2. 引入必要依賴</h2>
+                <p>在您的 HTML 檔案中引入以下依賴：</p>
+                <div class="code-block">
+                    &lt;link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet"&gt;<br>
+                    &lt;link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"&gt;<br>
+                    &lt;link rel="stylesheet" href="path/to/tiss.scss"&gt;
+                </div>
+                <div class="note">
+                    <strong>注意：</strong> 請確保將 <code>path/to/tiss.scss</code> 替換為實際的檔案路徑。
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>3. 使用元件</h2>
+                <p>直接使用對應的 class 名稱即可套用樣式：</p>
+                <div class="code-block">
+                    &lt;button class="tiss-btn tiss-btn-primary"&gt;主要按鈕&lt;/button&gt;<br>
+                    &lt;div class="tiss-alert tiss-alert-success"&gt;成功提示訊息&lt;/div&gt;<br>
+                    &lt;div class="tiss-card"&gt;卡片內容&lt;/div&gt;
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>4. 自訂主題顏色</h2>
+                <p>您可以透過修改 CSS 變量來自訂主題顏色：</p>
+                <div class="code-block">
+                    :root {<br>
+                    &nbsp;&nbsp;--tiss-blue: #004D9F;<br>
+                    &nbsp;&nbsp;--tiss-green: #00A886;<br>
+                    &nbsp;&nbsp;--tiss-dark-blue: #003366;<br>
+                    &nbsp;&nbsp;/* 其他顏色變量 */<br>
+                    }
+                </div>
+                <div class="note">
+                    <strong>提示：</strong> 所有顏色都使用 CSS 變量定義，您可以在 <code>:root</code> 選擇器中覆蓋這些變量來自訂主題。
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>5. 支援的元件</h2>
+                <p>TISS Design System 提供以下元件：</p>
+                <ul>
+                    <li>按鈕 (Buttons)</li>
+                    <li>表單元素 (Forms)</li>
+                    <li>卡片 (Cards)</li>
+                    <li>提示訊息 (Alerts)</li>
+                    <li>標籤 (Badges)</li>
+                    <li>表格 (Tables)</li>
+                    <li>彈跳視窗 (Modals)</li>
+                    <li>核取方塊 (Checkboxes)</li>
+                    <li>可折疊面板 (Collapsible)</li>
+                    <li>進度條 (Progress)</li>
+                    <li>分頁標籤 (Tabs)</li>
+                    <li>開關 (Toggles)</li>
+                </ul>
+                <div class="note">
+                    <strong>提示：</strong> 更多詳細的元件使用說明，請參考 <a href="index.html" style="color: white;">設計系統展示頁面</a>。
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        // 側邊欄收合功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
+                const icon = sidebarToggle.querySelector('i');
+                icon.classList.toggle('fa-bars');
+                icon.classList.toggle('fa-times');
+            });
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TISS Design System - 圖表</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="scss/tiss.scss">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --tiss-blue: #004D9F;
+            --tiss-green: #00A886;
+            --tiss-dark-blue: #003366;
+            --tiss-yellow: #FACB00;
+            --tiss-orange: #F29027;
+            --tiss-cyan: #00B1AD;
+            --tiss-error: #DC3545;
+            --tiss-warning: #FFA500;
+            --tiss-success: #28A745;
+            --tiss-info: #17A2B8;
+        }
+        
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            height: 100vh;
+            background: white;
+            padding: 2rem;
+            overflow-y: auto;
+            border-right: 1px solid #e0e0e0;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar.collapsed {
+            width: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .sidebar-toggle {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1000;
+            background: var(--tiss-blue);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-toggle:hover {
+            background: var(--tiss-dark-blue);
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+            transition: margin-left 0.3s ease;
+            width: calc(100% - 250px);
+        }
+        
+        .main-content.expanded {
+            margin-left: 0;
+            width: 100%;
+        }
+        
+        .chart-section {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .chart-container {
+            height: 400px;
+            margin-bottom: 2rem;
+            position: relative;
+            width: 100%;
+        }
+        
+        .chart-title {
+            color: var(--tiss-dark-blue);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--tiss-blue);
+        }
+        
+        .nav-link {
+            display: block;
+            padding: 0.75rem 0;
+            color: #424242;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            padding-left: 1rem;
+        }
+        
+        .nav-link:hover {
+            color: var(--tiss-blue);
+            border-left: 3px solid var(--tiss-blue);
+            background-color: rgba(0, 77, 159, 0.1);
+        }
+        
+        .code-block {
+            background: #f5f5f5;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-top: 1rem;
+            font-family: monospace;
+            position: relative;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+            color: #757575;
+        }
+        
+        .copy-btn:hover {
+            opacity: 1;
+            color: var(--tiss-blue);
+        }
+        
+        /* 確保圖表在小螢幕上也能正確顯示 */
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+            
+            .sidebar {
+                width: 0;
+                padding: 0;
+                overflow: hidden;
+            }
+            
+            .sidebar-toggle {
+                display: flex;
+            }
+            
+            .chart-container {
+                height: 300px;
+            }
+        }
+        
+        .sidebar-logo {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            border-bottom: 1px solid var(--tiss-gray-300);
+        }
+        
+        .logo-img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- 側邊欄收合按鈕 -->
+    <button class="sidebar-toggle" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- 側邊導航 -->
+    <nav class="sidebar">
+        <div class="sidebar-logo">
+            <img src="Tiss Logo-h.png" alt="TISS Logo" class="logo-img">
+        </div>
+        <nav>
+            <a href="index.html#colors" class="nav-link">顏色</a>
+            <a href="index.html#typography" class="nav-link">字體</a>
+            <a href="index.html#components" class="nav-link">元件</a>
+            <a href="index.html#utilities" class="nav-link">工具類</a>
+            <a href="charts.html" class="nav-link">圖表</a>
+            <a href="usage.html" class="nav-link">使用方法</a>
+        </nav>
+    </nav>
+
+    <!-- 主要內容 -->
+    <main class="main-content">
+        <h1 class="chart-title">圖表元件</h1>
+        
+        <!-- 折線圖 -->
+        <section class="chart-section">
+            <h2 class="chart-title">折線圖</h2>
+            <div class="chart-container">
+                <canvas id="lineChart"></canvas>
+            </div>
+            <div class="code-block">
+                tiss-chart-container
+                <button class="copy-btn" data-copy="tiss-chart-container"><i class="far fa-copy"></i></button>
+            </div>
+        </section>
+
+        <!-- 長條圖 -->
+        <section class="chart-section">
+            <h2 class="chart-title">長條圖</h2>
+            <div class="chart-container">
+                <canvas id="barChart"></canvas>
+            </div>
+            <div class="code-block">
+                tiss-chart-container
+                <button class="copy-btn" data-copy="tiss-chart-container"><i class="far fa-copy"></i></button>
+            </div>
+        </section>
+
+        <!-- 水平長條圖 -->
+        <section class="chart-section">
+            <h2 class="chart-title">水平長條圖</h2>
+            <div class="chart-container">
+                <canvas id="horizontalBarChart"></canvas>
+            </div>
+            <div class="code-block">
+                tiss-chart-container
+                <button class="copy-btn" data-copy="tiss-chart-container"><i class="far fa-copy"></i></button>
+            </div>
+        </section>
+
+        <!-- 堆疊長條圖 -->
+        <section class="chart-section">
+            <h2 class="chart-title">堆疊長條圖</h2>
+            <div class="chart-container">
+                <canvas id="stackedBarChart"></canvas>
+            </div>
+            <div class="code-block">
+                tiss-chart-container
+                <button class="copy-btn" data-copy="tiss-chart-container"><i class="far fa-copy"></i></button>
+            </div>
+        </section>
+
+        <!-- 浮動長條圖 -->
+        <section class="chart-section">
+            <h2 class="chart-title">浮動長條圖</h2>
+            <div class="chart-container">
+                <canvas id="floatingBarChart"></canvas>
+            </div>
+            <div class="code-block">
+                tiss-chart-container
+                <button class="copy-btn" data-copy="tiss-chart-container"><i class="far fa-copy"></i></button>
+            </div>
+        </section>
+
+        <!-- 圓餅圖 -->
+        <section class="chart-section">
+            <h2 class="chart-title">圓餅圖</h2>
+            <div class="chart-container">
+                <canvas id="pieChart"></canvas>
+            </div>
+            <div class="code-block">
+                tiss-chart-container
+                <button class="copy-btn" data-copy="tiss-chart-container"><i class="far fa-copy"></i></button>
+            </div>
+        </section>
+
+        <!-- 環圈圖 -->
+        <section class="chart-section">
+            <h2 class="chart-title">環圈圖</h2>
+            <div class="chart-container">
+                <canvas id="doughnutChart"></canvas>
+            </div>
+            <div class="code-block">
+                tiss-chart-container
+                <button class="copy-btn" data-copy="tiss-chart-container"><i class="far fa-copy"></i></button>
+            </div>
+        </section>
+
+        <!-- 雷達圖 -->
+        <section class="chart-section">
+            <h2 class="chart-title">雷達圖</h2>
+            <div class="chart-container">
+                <canvas id="radarChart"></canvas>
+            </div>
+            <div class="code-block">
+                tiss-chart-container
+                <button class="copy-btn" data-copy="tiss-chart-container"><i class="far fa-copy"></i></button>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 側邊欄收合功能
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
+                const icon = sidebarToggle.querySelector('i');
+                icon.classList.toggle('fa-bars');
+                icon.classList.toggle('fa-times');
+                
+                // 重新調整圖表大小
+                setTimeout(function() {
+                    window.dispatchEvent(new Event('resize'));
+                }, 300);
+            });
+            
+            // 折線圖 - 心率變化
+            const lineCtx = document.getElementById('lineChart').getContext('2d');
+            new Chart(lineCtx, {
+                type: 'line',
+                data: {
+                    labels: ['熱身', '5分鐘', '10分鐘', '15分鐘', '20分鐘', '25分鐘', '30分鐘', '緩和'],
+                    datasets: [{
+                        label: '心率 (BPM)',
+                        data: [75, 120, 145, 155, 160, 165, 170, 90],
+                        borderColor: '#004D9F',
+                        tension: 0.4,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '運動過程中心率變化'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 60,
+                            max: 180,
+                            title: {
+                                display: true,
+                                text: '心率 (BPM)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 長條圖 - 每週運動時間分配
+            const barCtx = document.getElementById('barChart').getContext('2d');
+            new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['有氧運動', '肌力訓練', '伸展運動', '核心訓練', '平衡訓練', '恢復日'],
+                    datasets: [{
+                        label: '每週運動時間 (小時)',
+                        data: [4, 3, 2, 2.5, 1.5, 1],
+                        backgroundColor: [
+                            '#004D9F',
+                            '#00A886',
+                            '#FACB00',
+                            '#F29027',
+                            '#00B1AD',
+                            '#DC3545'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '每週運動時間分配'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '時間 (小時)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 水平長條圖 - 運動項目喜好度
+            const horizontalBarCtx = document.getElementById('horizontalBarChart').getContext('2d');
+            new Chart(horizontalBarCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['跑步', '游泳', '騎自行車', '瑜伽', '重量訓練', '球類運動'],
+                    datasets: [{
+                        label: '喜好度評分 (1-10)',
+                        data: [8, 7, 9, 6, 8, 7],
+                        backgroundColor: '#004D9F'
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '運動項目喜好度評分'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 10,
+                            title: {
+                                display: true,
+                                text: '評分'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 堆疊長條圖 - 每日運動時間分配
+            const stackedBarCtx = document.getElementById('stackedBarChart').getContext('2d');
+            new Chart(stackedBarCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['週一', '週二', '週三', '週四', '週五', '週六', '週日'],
+                    datasets: [{
+                        label: '有氧運動',
+                        data: [1, 1.5, 1, 2, 1, 2.5, 1],
+                        backgroundColor: '#004D9F'
+                    }, {
+                        label: '肌力訓練',
+                        data: [0.5, 1, 1.5, 1, 1.5, 1, 0.5],
+                        backgroundColor: '#00A886'
+                    }, {
+                        label: '伸展運動',
+                        data: [0.5, 0.5, 0.5, 0.5, 0.5, 1, 1],
+                        backgroundColor: '#FACB00'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '每日運動時間分配'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true
+                        },
+                        y: {
+                            stacked: true,
+                            title: {
+                                display: true,
+                                text: '時間 (小時)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 浮動長條圖 - 體重變化範圍
+            const floatingBarCtx = document.getElementById('floatingBarChart').getContext('2d');
+            new Chart(floatingBarCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['一月', '二月', '三月', '四月', '五月', '六月'],
+                    datasets: [{
+                        label: '體重範圍 (kg)',
+                        data: [
+                            [65, 68],
+                            [64, 67],
+                            [63, 66],
+                            [62, 65],
+                            [61, 64],
+                            [60, 63]
+                        ],
+                        backgroundColor: '#004D9F'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '每月體重變化範圍'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            title: {
+                                display: true,
+                                text: '體重 (kg)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 圓餅圖 - 運動強度分布
+            const pieCtx = document.getElementById('pieChart').getContext('2d');
+            new Chart(pieCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['低強度', '中強度', '高強度', '恢復'],
+                    datasets: [{
+                        data: [30, 45, 15, 10],
+                        backgroundColor: [
+                            '#00A886',
+                            '#004D9F',
+                            '#F29027',
+                            '#FACB00'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '運動強度分布'
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // 環圈圖 - 營養攝入比例
+            const doughnutCtx = document.getElementById('doughnutChart').getContext('2d');
+            new Chart(doughnutCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['蛋白質', '碳水化合物', '脂肪', '維生素', '礦物質'],
+                    datasets: [{
+                        data: [30, 40, 15, 10, 5],
+                        backgroundColor: [
+                            '#004D9F',
+                            '#00A886',
+                            '#FACB00',
+                            '#F29027',
+                            '#00B1AD'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '每日營養攝入比例'
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // 雷達圖 - 運動能力評估
+            const radarCtx = document.getElementById('radarChart').getContext('2d');
+            new Chart(radarCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['心肺耐力', '肌力', '柔軟度', '平衡感', '協調性', '爆發力'],
+                    datasets: [{
+                        label: '目前水準',
+                        data: [85, 75, 90, 80, 85, 70],
+                        backgroundColor: 'rgba(0, 77, 159, 0.2)',
+                        borderColor: '#004D9F',
+                        pointBackgroundColor: '#004D9F'
+                    }, {
+                        label: '目標水準',
+                        data: [90, 85, 95, 85, 90, 80],
+                        backgroundColor: 'rgba(0, 168, 134, 0.2)',
+                        borderColor: '#00A886',
+                        pointBackgroundColor: '#00A886'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '運動能力評估'
+                        }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                stepSize: 20
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+        // 複製功能
+        document.querySelectorAll('.copy-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const textToCopy = this.getAttribute('data-copy');
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    alert('已複製到剪貼簿');
+                }).catch(err => {
+                    console.error('複製失敗:', err);
+                });
+            });
+        });
+    </script>
+</body>
+</html> 
