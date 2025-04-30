@@ -44,6 +44,8 @@
             border-radius: 8px;
             background-color: white;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            width: 100%;
+            box-sizing: border-box;
         }
         
         .component-title {
@@ -56,9 +58,10 @@
         
         .component-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
             margin-bottom: 1rem;
+            width: 100%;
         }
         
         .component-item {
@@ -67,6 +70,12 @@
             border-radius: 8px;
             background-color: white;
             transition: all 0.3s ease;
+            width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            overflow: hidden;
         }
         
         .component-item:hover {
@@ -176,10 +185,13 @@
             margin-left: 320px;
             padding: 2rem;
             transition: margin-left 0.3s ease;
+            width: calc(100% - 320px);
+            box-sizing: border-box;
         }
         
         .main-content.expanded {
             margin-left: 0;
+            width: 100%;
         }
         
         .nav-link {
@@ -360,6 +372,8 @@
         
         .tiss-form-group {
             margin-bottom: 1rem;
+            width: 100%;
+            box-sizing: border-box;
         }
         
         .tiss-label {
@@ -380,6 +394,7 @@
             border: 1px solid var(--tiss-gray-400);
             border-radius: 4px;
             transition: border-color 0.3s ease;
+            box-sizing: border-box;
         }
         
         .tiss-input:focus, .tiss-select:focus, .tiss-textarea:focus {
@@ -643,6 +658,7 @@
             width: 100%;
             height: 300px;
             margin-bottom: 1rem;
+            position: relative;
         }
 
         /* 核取方塊樣式 */
@@ -863,10 +879,12 @@
         /* 分頁導航樣式 */
         .tiss-page-nav {
             display: flex;
-            gap: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
             margin-bottom: 2rem;
             border-bottom: 1px solid var(--tiss-gray-300);
             padding-bottom: 1rem;
+            width: 100%;
         }
 
         .tiss-page-nav-item {
@@ -878,6 +896,7 @@
             font-weight: 500;
             transition: all 0.3s ease;
             border-bottom: 2px solid transparent;
+            white-space: nowrap;
         }
 
         .tiss-page-nav-item:hover {
@@ -946,6 +965,60 @@
             font-weight: 700;
             line-height: 1.8;
             margin: 1rem 0;
+        }
+
+        /* RWD 修正 */
+        @media (max-width: 1024px) {
+            .component-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+                width: 100%;
+            }
+            
+            .sidebar {
+                width: 0;
+                padding: 0;
+                overflow: hidden;
+            }
+            
+            .sidebar-toggle {
+                display: flex;
+            }
+
+            .component-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tiss-page-nav {
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
+            }
+
+            .tiss-page-nav-item {
+                padding: 0.5rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .component-section {
+                padding: 1rem;
+            }
+
+            .component-item {
+                padding: 1rem;
+            }
+
+            .code-block {
+                padding: 0.75rem;
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
