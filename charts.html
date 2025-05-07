@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TISS Design System - 圖表</title>
+    <title>TISS Design System - 圖表展示</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="scss/tiss.scss">
@@ -29,7 +29,7 @@
             background-color: #f8f9fa;
             overflow-x: hidden;
         }
-        
+
         .sidebar {
             position: fixed;
             top: 0;
@@ -102,7 +102,7 @@
             width: 100%;
             box-sizing: border-box;
         }
-        
+
         .chart-title {
             color: var(--tiss-dark-blue);
             margin-bottom: 1rem;
@@ -122,7 +122,7 @@
             border-left: 3px solid transparent;
             padding-left: 1rem;
         }
-        
+
         .nav-link:hover {
             color: var(--tiss-blue);
             border-left: 3px solid var(--tiss-blue);
@@ -137,7 +137,7 @@
             font-family: monospace;
             position: relative;
         }
-        
+
         .copy-btn {
             position: absolute;
             top: 0.5rem;
@@ -154,8 +154,19 @@
             opacity: 1;
             color: var(--tiss-blue);
         }
-        
-        /* 確保圖表在小螢幕上也能正確顯示 */
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-wrapper {
+            height: 400px;
+            position: relative;
+        }
+
         @media (max-width: 768px) {
             .main-content {
                 margin-left: 0;
@@ -174,6 +185,10 @@
             .chart-container {
                 height: 300px;
             }
+
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
         }
         
         .sidebar-logo {
@@ -186,40 +201,6 @@
             width: 100%;
             height: auto;
             display: block;
-        }
-
-        .font-demo {
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-        }
-
-        .font-item {
-            margin-bottom: 2rem;
-        }
-
-        .font-item h3 {
-            color: var(--tiss-dark-blue);
-            margin-bottom: 1rem;
-            font-weight: 700;
-        }
-
-        .font-regular {
-            font-weight: 400;
-            line-height: 1.8;
-            margin-bottom: 1rem;
-        }
-
-        .font-medium {
-            font-weight: 500;
-            line-height: 1.8;
-            margin-bottom: 1rem;
-        }
-
-        .font-bold {
-            font-weight: 700;
-            line-height: 1.8;
-            margin-bottom: 1rem;
         }
     </style>
 </head>
@@ -247,6 +228,33 @@
     <!-- 主要內容 -->
     <main class="main-content">
         <h1 class="chart-title">圖表元件</h1>
+
+        <!-- 比較圖表區塊 -->
+        <section class="chart-section">
+            <h2 class="chart-title">運動表現比較圖表</h2>
+            <div class="chart-grid">
+                <!-- 第一次測量結果 -->
+                <div class="chart-wrapper">
+                    <canvas id="firstMeasurement"></canvas>
+                </div>
+                <!-- 第二次測量結果 -->
+                <div class="chart-wrapper">
+                    <canvas id="secondMeasurement"></canvas>
+                </div>
+                <!-- 比較圖表 -->
+                <div class="chart-wrapper">
+                    <canvas id="comparisonChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- 複合式圖表區塊 -->
+        <section class="chart-section">
+            <h2 class="chart-title">運動數據複合式圖表</h2>
+            <div class="chart-wrapper">
+                <canvas id="combinedChart"></canvas>
+            </div>
+        </section>
         
         <!-- 折線圖 -->
         <section class="chart-section">
@@ -381,6 +389,178 @@
                 canvas.chart = chart;
                 return chart;
             }
+
+            // 第一次測量結果
+            const firstCtx = document.getElementById('firstMeasurement').getContext('2d');
+            initChart(firstCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['深蹲', '臥推', '硬舉', '引體向上', '伏地挺身'],
+                    datasets: [{
+                        label: '第一次測量 (公斤/次數)',
+                        data: [80, 60, 100, 8, 25],
+                        backgroundColor: '#004D9F',
+                        borderColor: '#004D9F',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '第一次體能測量結果'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '重量 (公斤) / 次數'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 第二次測量結果
+            const secondCtx = document.getElementById('secondMeasurement').getContext('2d');
+            initChart(secondCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['深蹲', '臥推', '硬舉', '引體向上', '伏地挺身'],
+                    datasets: [{
+                        label: '第二次測量 (公斤/次數)',
+                        data: [90, 70, 120, 12, 35],
+                        backgroundColor: '#00A886',
+                        borderColor: '#00A886',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '第二次體能測量結果'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '重量 (公斤) / 次數'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 比較圖表
+            const comparisonCtx = document.getElementById('comparisonChart').getContext('2d');
+            initChart(comparisonCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['深蹲', '臥推', '硬舉', '引體向上', '伏地挺身'],
+                    datasets: [{
+                        label: '第一次測量',
+                        data: [80, 60, 100, 8, 25],
+                        backgroundColor: '#004D9F',
+                        borderColor: '#004D9F',
+                        borderWidth: 1
+                    }, {
+                        label: '第二次測量',
+                        data: [90, 70, 120, 12, 35],
+                        backgroundColor: '#00A886',
+                        borderColor: '#00A886',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '兩次體能測量比較'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '重量 (公斤) / 次數'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 複合式圖表
+            const combinedCtx = document.getElementById('combinedChart').getContext('2d');
+            initChart(combinedCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['週一', '週二', '週三', '週四', '週五', '週六', '週日'],
+                    datasets: [{
+                        type: 'bar',
+                        label: '運動時間 (分鐘)',
+                        data: [45, 60, 30, 75, 45, 90, 30],
+                        backgroundColor: '#004D9F',
+                        borderColor: '#004D9F',
+                        borderWidth: 1,
+                        yAxisID: 'y'
+                    }, {
+                        type: 'line',
+                        label: '平均心率 (BPM)',
+                        data: [140, 155, 130, 165, 145, 170, 135],
+                        borderColor: '#F29027',
+                        backgroundColor: 'rgba(242, 144, 39, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        yAxisID: 'y1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '每週運動時間與心率變化'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: '運動時間 (分鐘)'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: '平均心率 (BPM)'
+                            },
+                            grid: {
+                                drawOnChartArea: false
+                            }
+                        }
+                    }
+                }
+            });
 
             // 折線圖 - 心率變化
             const lineCtx = document.getElementById('lineChart').getContext('2d');
